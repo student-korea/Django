@@ -1,0 +1,12 @@
+
+from django.urls import path,include
+from . import views
+
+app_name='students'
+urlpatterns = [
+    path('list/',views.list,name='list'),
+    path('view/',views.view,name='view'),
+    path('result/',views.result,name='result'),
+    path('write/',views.write,name='write'),
+    path('send/<str:name>/<int:age>/',views.send,name="send")
+]
