@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학생리스트</title>
+    <style>
+        h2{text-align:center;}
+        table,th,td{border:1px solid black; border-collapse:collapse;
+        text-align:center;}
+        th{height:35px;}
+        td{height:30px;}
+        table{width:1000px; margin:10px auto;}
+    </style>
+</head>
+<body>
+    <h2>학생리스트</h2>
+    {% if list %}
+        {%for s in list%}
+            <p>{{s.name}},{{s.major}},{{s.grade}},{{s.age}},{{s.gender}}<p>
+        {%endfor%}
+    {% endif%}
+    
+</body>
+</html>
