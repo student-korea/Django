@@ -27,7 +27,7 @@
       <li>로그인</li> <span>|</span>
       <li>고객행복센터</li> <span>|</span>
       <li>배송지역검색</li> <span>|</span>
-      <li>기프트카드 등록</li>
+      <li><a href="/admin/">관리자페이지</a></li>
     </ul>
   </header>
 
@@ -71,6 +71,15 @@
       </tr>
       <tr>
         <td colspan='2'class="article">{{board.bcontent}}</td>
+      </tr>
+       <tr>
+        <td colspan='2'class="article"><strong>이미지 첨부</strong><span class="separator">|</span>
+          {% if board.bfile %}
+            <img src='/media/{{board.bfile}}' width='400px'>
+          {%else%}
+            파일없음
+          {%endif%}
+        </td>
       </tr>
       <tr>
         <td><strong>다음글</strong> <span class="separator">|</span> [키즈잼] 2월 프로그램 안내</td>

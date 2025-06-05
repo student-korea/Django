@@ -20,6 +20,12 @@ header ul {
   list-style-type: none;
 }
 
+header > ul > li > a {
+  font-size: 13px;
+  color : white;
+  text-decoration: none;
+}
+
 li {
   display: inline-block;
   padding-right: 5px;

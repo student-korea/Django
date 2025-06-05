@@ -31,7 +31,7 @@
       <li>로그인</li> <span>|</span>
       <li>고객행복센터</li> <span>|</span>
       <li>배송지역검색</li> <span>|</span>
-      <li>기프트카드 등록</li>
+      <li><a href="/admin/">관리자페이지</a></li>
     </ul>
   </header>
 
@@ -63,8 +63,9 @@
     <h1>관리자 글쓰기</h1>
     <hr>
 
-    <form action="/board/update/{{board.bno}}/" name="updateFrm" method="post">
+    <form action="/board/update/{{board.bno}}/" name="updateFrm" method="post" enctype='multipart/form-data'>
       {% csrf_token %}
+      <input type = 'hidden' name='bfile_pre' value='{{board.bfile}}'>
       <table>
         <colgroup>
           <col width="15%">
@@ -92,7 +93,12 @@
         <tr>
           <th>이미지 표시</th>
           <td>
-            <input type="file" name="bfile" id="file" value ='{{board.bfile}}'>
+            <input type="file" name="bfile" id="file" >
+          </td>
+        </tr>
+        <tr>
+          <th>이미지 표시</th>
+          <td>{{board.bfile}}
           </td>
         </tr>
       </table>

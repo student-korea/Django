@@ -33,7 +33,7 @@
       <li>로그인</li> <span>|</span>
       <li>고객행복센터</li> <span>|</span>
       <li>배송지역검색</li> <span>|</span>
-      <li>기프트카드 등록</li>
+      <li><a href="/admin/">관리자페이지</a></li>
     </ul>
   </header>
 
@@ -65,7 +65,7 @@
     <h1>게시글수정</h1>
     <hr>
 
-    <form action="/board/write/" name="writeFrm" method="post">
+    <form action="/board/write/" name="writeFrm" method="post" enctype='multipart/form-data'>
       {% csrf_token %}
       <table>
         <colgroup>

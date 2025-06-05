@@ -12,9 +12,8 @@ class Board(models.Model):
     bindent = models.IntegerField(default=0)
     #------
     bhit = models.IntegerField(default=0)
-    bfile = models.CharField(max_length=100,null=True,blank=True)
+    bfile = models.ImageField(null=True,blank=True,upload_to='board') # FileField
     bdate = models.DateTimeField(auto_now=True)
     
     def __str__(self):
         return f'{self.bno},{self.btitle},{self.bgroup}'
-    
