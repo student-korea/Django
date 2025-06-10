@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -89,7 +90,7 @@ $(document).ready(function() {
 	<div id="header">
 		
 		<div id="snbBox">
-			<h1><img src="/static/images/txt/logo.gif" alt="JARDIN SHOP" /></h1>
+			<a href="/"><h1><img src="/static/images/txt/logo.gif" alt="JARDIN SHOP" /></h1></a>
 			<div id="quickmenu">
 				<div id="mnaviOpen"><img src="/static/images/btn/btn_mnavi.gif" width="33" height="31" alt="메뉴열기" /></div>
 				<div id="mnaviClose"><img src="/static/images/btn/btn_mnavi_close.gif" width="44" height="43" alt="메뉴닫기" /></div>
@@ -214,26 +215,24 @@ $(document).ready(function() {
 						<div class="viewHead">
 							<div class="subject">
 								<ul>
-									<li>쟈뎅 전문 쇼핑몰 쟈뎅샵이 리뉴얼 오픈합니다.</li>
+									<li>{{board.btitle}}</li>
 								</ul>
 							</div>
 							<div class="day">
-								<p class="txt">작성일<span>14.01.28</span></p>
+								<p class="txt">작성일<span>{{board.bdate|date:'Y-m-d'}}</span></p>
+							</div>
+							<div class="day">
+								<p class="txt">작성자<span>{{board.member.name}}</span></p>
 							</div>
 						</div>
 
 						<div class="viewContents">
-							안녕하세요. 쟈뎅샵입니다.<br/>
-							늘 저희 쟈뎅을 사랑해주시는 많은 고객님들께 감사 인사드립니다.<br/>
-							변함없는 고객님들의 사랑에 보답하고자, 쟈뎅이 온라인 쇼핑몰을 새롭게 리뉴얼 오픈하게 되었습니다.<br/>
-							기존에 tea24로 이용하시던 쟈뎅 제품 전문 쇼핑몰이 쟈뎅샵(jardinshop)이라는 새로운 공간으로<br/>
-							오픈하게 되었습니다.<br/>
-							더욱 새로운 모습과 늘 발전하는 모습으로 찾아뵙도록 하겠습니다.<br/><br/>
-
-							감사합니다.
+							{{board.bcontent}}
+						</div>
+						<div class="viewContents">
+							<img src='/media/board/{{board.bfile}}/' width='50%'/>
 						</div>
 					</div>
-
 
 					<!-- 이전다음글 -->
 					<div class="pnDiv web">
@@ -246,24 +245,90 @@ $(document).ready(function() {
 							<tbody>
 								<tr>
 									<th class="pre">PREV</th>
-									<td><a href="#">상품 재입고는 언제 되나요?</a></td>
+									{% if pre_board %}
+										<td><a href="/board/view/{{pre_board.bno}}/">{{pre_board.btitle}}</a></td>
+									{% else %}
+										<td>이전글이 없습니다.</td>
+									{% endif %}
 								</tr>
 
 								<tr>
 									<th class="next">NEXT</th>
-									<td>다음 글이 없습니다.</td>
+									{% if next_board %}
+										<td><a href="/board/view/{{next_board.bno}}/">{{next_board.btitle}}</a></td>
+									{% else %}
+										<td>다음글이 없습니다.</td>
+									{% endif %}
+									
 								</tr>
 							</tbody>
 						</table>
 					</div>
 					<!-- //이전다음글 -->
 
+					<!-- 댓글-->
+					<div class="replyWrite">
+						<ul>
+							<li class="in">
+								<p class="txt">총 <span class="orange">3</span> 개의 댓글이 달려있습니다.</p>
+								<p class="password">비밀번호&nbsp;&nbsp;<input type="password" class="replynum" /></p>
+								<textarea class="replyType"></textarea>
+							</li>
+							<li class="btn"><a href="#" class="replyBtn">등록</a></li>
+						</ul>
+						<p class="ntic">※ 비밀번호를 입력하시면 댓글이 비밀글로 등록 됩니다.</p>
+					</div>
+
+					<div class="replyBox">
+						<ul>
+							<li class="name">jjabcde <span>[2014-03-04&nbsp;&nbsp;15:01:59]</span></li>
+							<li class="txt"><textarea class="replyType"></textarea></li>
+							<li class="btn">
+								<a href="#" class="rebtn">수정</a>
+								<a href="#" class="rebtn">삭제</a>
+							</li>
+						</ul>
+						<!--
+						<ul>
+							<li class="name">jjabcde <span>[2014-03-04&nbsp;&nbsp;15:01:59]</span></li>
+							<li class="txt">대박!!! 이거 저한테 완전 필요한 이벤트였어요!!</li>
+							<li class="btn">
+								<a href="#" class="rebtn">수정</a>
+								<a href="#" class="rebtn">삭제</a>
+							</li>
+						</ul>
+						-->
+						<!--비밀글
+						<ul>
+							<li class="name">jjabcde <span>[2014-03-04&nbsp;&nbsp;15:01:59]</span></li>
+							<li class="txt">
+								<a href="password.html" class="passwordBtn"><span class="orange">※ 비밀글입니다.</span></a>
+							</li>
+						</ul>
+						-->
+					</div>
+					<!-- //댓글 -->
 
 					<!-- Btn Area -->
 					<div class="btnArea btline">
 						<div class="bRight">
 							<ul>
-								<li><a href="#" class="sbtnMini mw">목록</a></li>
+								<li><a href="/board/list/" class="sbtnMini mw">목록</a></li>
+							</ul>
+						</div>
+						<div class="bRight">
+							<ul>
+								<li><a href="#" class="nbtnbig">삭제</a></li>
+							</ul>
+						</div>
+						<div class="bRight">
+							<ul>
+								<li><a href="#" class="nbtnbig">수정</a></li>
+							</ul>
+						</div>
+						<div class="bRight">
+							<ul>
+								<li><a href="#" class="nbtnbig">답글</a></li>
 							</ul>
 						</div>
 					</div>

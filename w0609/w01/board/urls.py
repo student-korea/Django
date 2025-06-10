@@ -5,5 +5,5 @@ app_name='board'
 urlpatterns = [
     path('list/', views.list,name='list'),
     path('write/', views.write,name='write'),
-    path('view/', views.view,name='view'),
+    path('view/<int:bno>/', views.view,name='view'),
 ]
