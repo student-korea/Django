@@ -3,6 +3,8 @@ from django.core.paginator import Paginator
 from django.db.models import F,Q
 from board.models import Board
 from member.models import Member
+from comment.models import Comment
+
 # Create your views here.
 def list(request):
     page = int(request.GET.get('page',1))
@@ -42,5 +44,7 @@ def view(request,bno):
        Q(ntcnk__gt=qs[0].ntcnk)
     ).order_by('ntcnk','bgroup','-bstep').first()
     
-    context = {'board':qs[0],'pre_board':pre_qs,'next_board':next_qs}
+    c_qs = Comment.objects.filter(board=qs[0]).order_by('-cno')
+    
+    context = {'board':qs[0],'pre_board':pre_qs,'next_board':next_qs,'comment':c_qs}
     return render(request,'view.html',context)

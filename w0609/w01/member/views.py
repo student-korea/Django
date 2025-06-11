@@ -15,6 +15,7 @@ def login(request):
         try:
             qs = Member.objects.get(id=id,pw=pw)
             request.session['session_id']=id
+            request.session['session_name']=qs.name
             msg=1
         except: pass
         cook_id = request.COOKIES.get('cook_id','')

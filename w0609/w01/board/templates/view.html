@@ -8,10 +8,13 @@
 <meta name="description" content="JARDIN SHOP" />
 <meta name="keywords" content="JARDIN SHOP" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scaleable=no" />
+<meta name='csrf-token' content='{{csrf_token}}'>
 <link rel="stylesheet" type="text/css" href="/static/css/reset.css?v=Y" />
 <link rel="stylesheet" type="text/css" href="/static/css/layout.css?v=Y" />
 <link rel="stylesheet" type="text/css" href="/static/css/content.css?v=Y" />
-<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<!-- 날짜 포맷함수 -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 <script type="text/javascript" src="/static/js/top_navi.js"></script>
 <script type="text/javascript" src="/static/js/left_navi.js"></script>
 <script type="text/javascript" src="/static/js/main.js"></script>
@@ -90,7 +93,9 @@ $(document).ready(function() {
 	<div id="header">
 		
 		<div id="snbBox">
-			<a href="/"><h1><img src="/static/images/txt/logo.gif" alt="JARDIN SHOP" /></h1></a>
+			<a href='/'>
+				<h1><img src="/static/images/txt/logo.gif" alt="JARDIN SHOP" /></h1>
+			</a>
 			<div id="quickmenu">
 				<div id="mnaviOpen"><img src="/static/images/btn/btn_mnavi.gif" width="33" height="31" alt="메뉴열기" /></div>
 				<div id="mnaviClose"><img src="/static/images/btn/btn_mnavi_close.gif" width="44" height="43" alt="메뉴닫기" /></div>
@@ -230,9 +235,10 @@ $(document).ready(function() {
 							{{board.bcontent}}
 						</div>
 						<div class="viewContents">
-							<img src='/media/board/{{board.bfile}}/' width='50%'/>
+							<img src='/media/board/{{board.bfile}}/' width='50%'>
 						</div>
 					</div>
+
 
 					<!-- 이전다음글 -->
 					<div class="pnDiv web">
@@ -249,63 +255,159 @@ $(document).ready(function() {
 										<td><a href="/board/view/{{pre_board.bno}}/">{{pre_board.btitle}}</a></td>
 									{% else %}
 										<td>이전글이 없습니다.</td>
-									{% endif %}
+									{% endif %}	
 								</tr>
 
 								<tr>
 									<th class="next">NEXT</th>
 									{% if next_board %}
-										<td><a href="/board/view/{{next_board.bno}}/">{{next_board.btitle}}</a></td>
+										<td><a href="/board/view/{{next_board.bno}}/">{{next_board.btitle}}</td>
 									{% else %}
 										<td>다음글이 없습니다.</td>
-									{% endif %}
-									
+									{% endif %}	
 								</tr>
 							</tbody>
 						</table>
 					</div>
 					<!-- //이전다음글 -->
+					<script>
+						$(function(){
+							//전역변수 
+							csrfToken = $('meta[name="csrf-token"]').attr('content');
+							// 하단댓글등록
+							$('.replyBtn').click(function(){
+								if('{{request.session.session_id}}'==''){
+									alert('로그인을 하셔야 하단댓글 등록이 가능합니다.');
+									location.href='/member/login/';
+									return;
+								}
+								alert('하단댓글을 등록합니다.');
+								console.log('비밀번호 : ',$('.replynum').val())
+								console.log('게시글번호 : ','{{board.bno}}')
+								console.log('내용 : ',$('.replyType').val())
+								console.log('csrf-token : ',$('meta[name="csrf-token"]').attr('content'));
+								//데이터
+								cpw = $('.replynum').val();
+								ccontent = $('.replyType').val();
+								
+								//ajax데이터전송
+								$.ajax({
+									url:'/comment/cwrite/',
+									type:'post',
+									headers:{'X-CSRFToken':csrfToken},
+									data:{'cpw':cpw,'ccontent':ccontent,'bno':'{{board.bno}}'},
+									success:function(data){
+										console.log(data);
+										cdate = moment(data.comment[0].cdate).format('YYYY-MM-DD HH:mm:ss');
+										//하단댓글 등록
+										var hdata = ``;
+										hdata += `<ul id='${data.comment[0].cno}'>`;
+										hdata += `<li class="name">{{request.session.session_name}} <span>[ ${cdate} ]</span></li>`;
+										hdata += `<li class="txt">${data.comment[0].ccontent}</li>`;
+										hdata += `<li class="btn">`;
+										hdata += `<a class="rebtn">수정</a>&nbsp`;
+										hdata += `<a class="rebtn delBtn">삭제</a>`;
+										hdata += `</li>`;
+										hdata += `</ul>`;
+										$(".replyBox").prepend(hdata);
 
+										// 하단댓글 총개수 추가
+										$('.c_count').text(Number($('.c_count').text())+1);
+										// inputbox 글자 삭제
+										$('.replynum').val('');
+										$('.replyType').val('');
+									},
+									error:function(){
+										alert('실패');
+									}
+								});//ajax선언
+							});//replyBtn
+
+
+							// 하단댓글삭제 .click : 정적명령어구문-처음html페이지 있는 것만 삭제가능
+							//$('.delBtn').click(function(){
+							// .on 동적명령어구문
+							$(document).on("click",".delBtn",function(){
+								let cno = $(this).closest('ul').attr('id');
+								console.log("현재위치 : ",cno);
+								if(confirm(`${cno}번 게시글을 삭제하시겠습니까?`)){
+									// db부분 삭제 -> ajax요청
+									$.ajax({
+										url: '/comment/cdelete/',
+										type:'post',
+										headers:{'X-CSRFToken':csrfToken},
+										data:{'cno':cno},
+										success:function(data){
+											console.log('넘어온데이터 : ',data);
+											$(`#${cno}`).remove();
+											// 하단댓글 총개수 감소
+											$('.c_count').text(Number($('.c_count').text())-1);
+											alert(`${cno}번 게시글을 삭제했습니다.`);
+										},
+										error:function(){
+											alert('실패');
+										}
+									});//ajax선언
+								}//confirm
+							});//
+
+							
+
+
+						});//jquery선언
+
+						
+					</script>
 					<!-- 댓글-->
 					<div class="replyWrite">
 						<ul>
 							<li class="in">
-								<p class="txt">총 <span class="orange">3</span> 개의 댓글이 달려있습니다.</p>
-								<p class="password">비밀번호&nbsp;&nbsp;<input type="password" class="replynum" /></p>
-								<textarea class="replyType"></textarea>
+								<p class="txt">총 <span class="orange c_count">{{comment.count}}</span> 개의 댓글이 달려있습니다.</p>
+								<p class="password">비밀번호&nbsp;&nbsp;<input type="password" name='cpw' class="replynum" /></p>
+								<textarea class="replyType" name='ccontent'></textarea>
 							</li>
-							<li class="btn"><a href="#" class="replyBtn">등록</a></li>
+							<li class="btn"><a class="replyBtn">등록</a></li>
 						</ul>
 						<p class="ntic">※ 비밀번호를 입력하시면 댓글이 비밀글로 등록 됩니다.</p>
 					</div>
 
 					<div class="replyBox">
-						<ul>
-							<li class="name">jjabcde <span>[2014-03-04&nbsp;&nbsp;15:01:59]</span></li>
-							<li class="txt"><textarea class="replyType"></textarea></li>
+						{% if comment %}
+						{% for c in comment %}
+						<ul id='{{c.cno}}'>
+							<li class="name">{{c.member.name}} <span>[ {{c.cdate|date:'Y-m-d  H:i:s'}} ]</span></li>
+							<li class="txt">{{c.ccontent}}</li>
 							<li class="btn">
-								<a href="#" class="rebtn">수정</a>
-								<a href="#" class="rebtn">삭제</a>
+								<a class="rebtn ">수정</a>
+								<a class="rebtn delBtn">삭제</a>
 							</li>
 						</ul>
+						{% endfor %}
+						{% else %}
+						<ul><li>하단댓글이 없습니다.</li></ul>
+						{% endif %}
+
+						<!-- 하단댓글입력부분 -->
 						<!--
-						<ul>
-							<li class="name">jjabcde <span>[2014-03-04&nbsp;&nbsp;15:01:59]</span></li>
-							<li class="txt">대박!!! 이거 저한테 완전 필요한 이벤트였어요!!</li>
-							<li class="btn">
-								<a href="#" class="rebtn">수정</a>
-								<a href="#" class="rebtn">삭제</a>
-							</li>
-						</ul>
+							<ul>
+								<li class="name">jjabcde <span>[2014-03-04&nbsp;&nbsp;15:01:59]</span></li>
+								<li class="txt"><textarea class="replyType"></textarea></li>
+								<li class="btn">
+									<a href="#" class="rebtn">저장</a>
+									<a href="#" class="rebtn">취소</a>
+								</li>
+							</ul>
 						-->
-						<!--비밀글
-						<ul>
-							<li class="name">jjabcde <span>[2014-03-04&nbsp;&nbsp;15:01:59]</span></li>
-							<li class="txt">
-								<a href="password.html" class="passwordBtn"><span class="orange">※ 비밀글입니다.</span></a>
-							</li>
-						</ul>
-						-->
+
+						<!-- 비밀글부분 -->
+						<!--
+							<ul>
+								<li class="name">jjabcde <span>[2014-03-04&nbsp;&nbsp;15:01:59]</span></li>
+								<li class="txt">
+									<a href="password.html" class="passwordBtn"><span class="orange">※ 비밀글입니다.</span></a>
+								</li>
+							</ul>
+						--> 
 					</div>
 					<!-- //댓글 -->
 
@@ -328,7 +430,7 @@ $(document).ready(function() {
 						</div>
 						<div class="bRight">
 							<ul>
-								<li><a href="#" class="nbtnbig">답글</a></li>
+								<li><a href="#" class="nbtnbig">답글달기</a></li>
 							</ul>
 						</div>
 					</div>
