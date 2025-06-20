@@ -14,7 +14,7 @@ def login(request):
     cook_id = request.COOKIES.get('cook_id','')
     context = {'cook_id':cook_id}
     if request.method == 'GET':
-        return render(request,'member/login.html',context)
+        return render(request,'login.html',context)
     elif request.method == 'POST':
         
         id = request.POST.get('id')
@@ -31,7 +31,7 @@ def login(request):
         else:
             msg = 0    
         context['msg'] = msg
-        response = render(request,'member/login.html',context)
+        response = render(request,'login.html',context)
         if idsave:
             response.set_cookie('cook_id',id,max_age=60*60*24)
         else:
@@ -44,18 +44,18 @@ def logout(request):
     request.session.clear()
     msg = 2
     context = {'msg':msg}
-    return render(request,'member/login.html',context)
+    return render(request,'login.html',context)
 
 # 회원가입02
 def step02(request):
     if c_chk != 1:
         return redirect('/')
     else:
-        return render(request,'member/step02.html')
+        return render(request,'step02.html')
 
 # 회원가입01
 def step01(request):
-    return render(request,'member/step01.html')
+    return render(request,'step01.html')
 
 # 이메일발송
 def emailSend(request):
